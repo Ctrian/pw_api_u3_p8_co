@@ -11,6 +11,7 @@ public class EstudianteServiceImpl implements IEstudianteService {
     @Inject
     private IEstudianteRepo estudianteRepo;
 
+    @Override
     public Estudiante buscarPorId(Integer id) {
         return this.estudianteRepo.seleccionarPorId(id);
     }
