@@ -9,7 +9,7 @@ import uce.edu.web.api.repository.modelo.Estudiante;
 
 @ApplicationScoped
 public class EstudianteServiceImpl implements IEstudianteService {
-    
+
     @Inject
     private IEstudianteRepo estudianteRepo;
 
@@ -21,5 +21,25 @@ public class EstudianteServiceImpl implements IEstudianteService {
     @Override
     public List<Estudiante> buscarTodos() {
         return this.estudianteRepo.seleccionarTodos();
+    }
+
+    @Override
+    public void actualizarPorId(Estudiante estudiante) {
+        this.estudianteRepo.actualizarPorId(estudiante);
+    }
+
+    @Override
+    public void actualizarParcialPorId(Estudiante estudiante) {
+        this.estudianteRepo.actualizarParcialPorId(estudiante);
+    }
+
+    @Override
+    public void eliminarPorId(Integer id) {
+        this.estudianteRepo.borrarPorId(id);
+    }
+
+    @Override
+    public void guardar(Estudiante estudiante) {
+        this.estudianteRepo.insertar(estudiante);
     }
 }
