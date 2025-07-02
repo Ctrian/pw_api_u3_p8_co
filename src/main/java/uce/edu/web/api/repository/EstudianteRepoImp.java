@@ -46,6 +46,6 @@ public class EstudianteRepoImp implements IEstudianteRepo {
 
     @Override
     public void insertar(Estudiante estudiante) {
-        this.entityManager.merge(estudiante);
+        this.entityManager.persist(estudiante);
     }
 }

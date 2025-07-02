@@ -17,7 +17,7 @@ import uce.edu.web.api.service.IProfesorService;
 
 @Path("/profesores")
 public class ProfesorController {
-    
+
     @Inject
     private IProfesorService profesorService;
 
@@ -35,26 +35,38 @@ public class ProfesorController {
 
     @POST
     @Path("")
-    public void guardar(Profesor profesor){
-
+    public void guardar(Profesor profesor) {
+        this.profesorService.guardar(profesor);
     }
 
     @PUT
-    @Path("")
-    public void actualizar(@RequestBody Profesor profesor, @PathParam("id") Integer id){
-
+    @Path("/{id}")
+    public void actualizar(@RequestBody Profesor profesor, @PathParam("id") Integer id) {
+        profesor.setId(id);
+        this.profesorService.actualizarPorId(profesor);
     }
 
     @PATCH
     @Path("/{id}")
     public void actualizarParcial(@RequestBody Profesor profesor, @PathParam("id") Integer id) {
-
+        profesor.setId(id);
+        Profesor p = this.profesorService.buscarPorId(id);
+        if (profesor.getNombre() != null) {
+            p.setNombre(profesor.getNombre());
+        }
+        if (profesor.getApellido() != null) {
+            p.setApellido(profesor.getApellido());
+        }
+        if (profesor.getEmail() != null) {
+            p.setEmail(profesor.getEmail());
+        }
+        this.profesorService.actualizarPorId(p);
     }
 
     @DELETE
-    @Path("{/id}")
+    @Path("/{id}")
     public void eliminar(@PathParam("id") Integer id) {
-        
+        this.profesorService.eliminarPorId(id);
     }
 
 }
