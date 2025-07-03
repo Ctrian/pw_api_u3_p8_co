@@ -1,16 +1,13 @@
 package uce.edu.web.api.controller;
 
-import java.util.List;
-
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
 import jakarta.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
 
-// import jakarta.enterprise.inject.Produces; // Removed incorrect import
-import jakarta.ws.rs.Produces;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
@@ -58,8 +55,9 @@ public class EstudianteController {
         summary = "Guardar Estudiante",
         description = "Guarda un nuevo estudiante en el sistema"
     )
-    public void guardar(@RequestBody Estudiante estudiante) {
+    public Response guardar(@RequestBody Estudiante estudiante) {
        this.estudianteService.guardar(estudiante);
+       return Response.status(Response.Status.CREATED).entity("Estudiante guardado exitosamente").build();
     }
  
     @PUT
