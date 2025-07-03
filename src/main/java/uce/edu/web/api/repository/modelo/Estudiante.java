@@ -8,7 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+@XmlRootElement
 @Entity
 @Table(name = "estudiante")
 public class Estudiante {
@@ -24,6 +27,7 @@ public class Estudiante {
     @Column(name = "estu_apellido")
     private String apellido;
 
+    @XmlJavaTypeAdapter(LocalDateTimeAdapter.class)
     @Column(name = "estu_fecha_nacimiento")
     private LocalDateTime fechaNacimiento;
 
