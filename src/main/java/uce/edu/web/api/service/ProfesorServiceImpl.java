@@ -4,8 +4,10 @@ import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.ws.rs.core.UriInfo;
 import uce.edu.web.api.repository.IProfesorRepo;
 import uce.edu.web.api.repository.modelo.Profesor;
+import uce.edu.web.api.service.to.ProfesorTo;
 
 @ApplicationScoped
 public class ProfesorServiceImpl implements IProfesorService {
@@ -14,8 +16,10 @@ public class ProfesorServiceImpl implements IProfesorService {
     private IProfesorRepo profesorRepo;
 
     @Override
-    public Profesor buscarPorId(Integer id) {
-        return this.profesorRepo.seleccionarPorId(id);
+    public ProfesorTo buscarPorId(Integer id, UriInfo uriInfo) {
+        Profesor p = this.profesorRepo.seleccionarPorId(id);
+        ProfesorTo profesor = new ProfesorTo(p.getId(), p.getNombre(), p.getApellido(), p.getMateria(), p.getEmail(), uriInfo);
+        return profesor;
     }
 
     @Override
