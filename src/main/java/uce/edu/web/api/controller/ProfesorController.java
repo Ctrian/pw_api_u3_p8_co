@@ -22,7 +22,7 @@ import uce.edu.web.api.repository.modelo.Profesor;
 import uce.edu.web.api.service.IProfesorService;
 
 @Path("/profesores")
-public class ProfesorController {
+public class ProfesorController extends BaseControlador {
 
     @Inject
     private IProfesorService profesorService;
