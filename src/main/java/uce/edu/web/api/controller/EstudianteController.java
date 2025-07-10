@@ -28,13 +28,20 @@ import jakarta.ws.rs.core.UriInfo;
 import uce.edu.web.api.repository.modelo.Estudiante;
 import uce.edu.web.api.repository.modelo.Hijo;
 import uce.edu.web.api.service.IEstudianteService;
+import uce.edu.web.api.service.IHijoService;
+import uce.edu.web.api.service.mapper.EstudianteMapper;
 import uce.edu.web.api.service.to.EstudianteTo;
 
 @Path("/estudiantes")
-public class EstudianteController extends BaseControlador {
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class EstudianteController {
 
     @Inject
     private IEstudianteService estudianteService;
+
+    @Inject
+    private IHijoService hijoService;
 
     @GET
     @Path("/{id}")
@@ -42,7 +49,8 @@ public class EstudianteController extends BaseControlador {
     @Produces(MediaType.APPLICATION_JSON)
     public Response consultarEstudiantePorId(@PathParam("id") Integer id, @Context UriInfo uriInfo) {
 
-        EstudianteTo estudianteTo = this.estudianteService.buscarPorId(id, uriInfo);
+        EstudianteTo estudianteTo = EstudianteMapper.toTo(this.estudianteService.buscarPorId(id));
+        estudianteTo.buildURI(uriInfo);
 
         return Response.status(227).entity(estudianteTo).build();
     }
@@ -108,20 +116,11 @@ public class EstudianteController extends BaseControlador {
         this.estudianteService.eliminarPorId(id);
         return Response.status(Response.Status.NO_CONTENT).build();
     }
-    
+
     // http://.../estudiantes/1/hijos GET
     @GET
     @Path("/{id}/hijos")
     public List<Hijo> obtenerHijosPorId(@PathParam("id") Integer id) {
-        Hijo hijo = new Hijo();
-        hijo.setNombre("pepardo");
-
-        Hijo hijo2 = new Hijo();
-        hijo2.setNombre("calamardo");
-
-        List<Hijo> hijos = new ArrayList<>();
-        hijos.add(hijo);
-        hijos.add(hijo2);
-        return hijos;
+        return this.hijoService.buscarPorEstudianteId(id);
     }
 }

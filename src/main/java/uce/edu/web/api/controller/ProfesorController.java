@@ -27,7 +27,9 @@ import uce.edu.web.api.service.IProfesorService;
 import uce.edu.web.api.service.to.ProfesorTo;
 
 @Path("/profesores")
-public class ProfesorController extends BaseControlador {
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class ProfesorController {
 
     @Inject
     private IProfesorService profesorService;
