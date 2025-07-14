@@ -6,6 +6,7 @@ import java.util.Map;
 
 import jakarta.persistence.Column;
 import jakarta.ws.rs.core.UriInfo;
+import uce.edu.web.api.controller.EstudianteController;
 import uce.edu.web.api.controller.ProfesorController;
 
 public class ProfesorTo {
@@ -22,21 +23,6 @@ public class ProfesorTo {
 
     // Links de hijos para ProfesorTo
     public Map<String, String> _links = new HashMap<>();
-
-    public ProfesorTo(Integer id, String nombre, String apellido, String materia, String email, UriInfo uriInfo) {
-        this.id = id;
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.materia = materia;
-        this.email = email;
-
-        URI todosHijos = uriInfo.getBaseUriBuilder()
-                .path(ProfesorController.class)
-                .path(ProfesorController.class, "obtenerHijosPorId")
-                .build(id);
-
-        _links.put("hijos", todosHijos.toString());
-    }
 
     public Integer getId() {
         return id;
@@ -77,5 +63,20 @@ public class ProfesorTo {
     public void setEmail(String email) {
         this.email = email;
     }
+
+     public void buildURI(UriInfo uriInfo) {
+        URI todosHijos = uriInfo.getBaseUriBuilder().path(ProfesorController.class)
+                .path(ProfesorController.class, "obtenerHijosPorId").build(id);
+
+        _links.put("hijos", todosHijos.toString());
+    }
+
+     public Map<String, String> get_links() {
+         return _links;
+     }
+
+     public void set_links(Map<String, String> _links) {
+         this._links = _links;
+     }
 
 }

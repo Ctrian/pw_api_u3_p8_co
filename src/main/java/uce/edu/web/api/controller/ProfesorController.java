@@ -21,9 +21,14 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
+import uce.edu.web.api.repository.modelo.Estudiante;
 import uce.edu.web.api.repository.modelo.Hijo;
 import uce.edu.web.api.repository.modelo.Profesor;
+import uce.edu.web.api.service.IHijoService;
 import uce.edu.web.api.service.IProfesorService;
+import uce.edu.web.api.service.mapper.EstudianteMapper;
+import uce.edu.web.api.service.mapper.ProfesorMapper;
+import uce.edu.web.api.service.to.EstudianteTo;
 import uce.edu.web.api.service.to.ProfesorTo;
 
 @Path("/profesores")
@@ -34,13 +39,17 @@ public class ProfesorController {
     @Inject
     private IProfesorService profesorService;
 
+    @Inject
+    private IHijoService iHijoService;
+
     @GET
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response consultarProfesorPorId(@PathParam("id") Integer id, @Context UriInfo uriInfo) {
 
-        ProfesorTo profesorTo = this.profesorService.buscarPorId(id, uriInfo);
+        ProfesorTo profesorTo = ProfesorMapper.toTo(this.profesorService.buscarPorId(id));
+        profesorTo.buildURI(uriInfo);
 
         return Response.status(Response.Status.ACCEPTED).entity(profesorTo).build();
     }
@@ -51,16 +60,26 @@ public class ProfesorController {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Consultar Profesores", description = "Este endpoint obtiene una lista de todos los profesores")
     public Response consultarProfesores(@QueryParam("materia") String materia,
-            @QueryParam("provincia") String provincia) {
-        System.out.println(provincia);
-        return Response.status(Response.Status.CREATED).entity(this.profesorService.buscarTodos()).build();
+            @QueryParam("provincia") String provincia, @Context UriInfo uriInfo) {
+        System.out.println("Provincia query param:" + provincia);
+
+        List<Profesor> profesors = this.profesorService.buscarTodos();
+        List<ProfesorTo> profesorTos = new ArrayList<>();
+
+        for(Profesor p : profesors) {
+            ProfesorTo profesorTo = ProfesorMapper.toTo(p);
+            profesorTo.buildURI(uriInfo);
+            profesorTos.add(profesorTo);
+        }
+        return Response.status(Response.Status.CREATED).entity(profesorTos).build();
     }
 
     @POST
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Guardar Profesor", description = "Guarda un nuevo profesor en el sistema")
-    public Response guardar(Profesor profesor) {
+    public Response guardar(@RequestBody ProfesorTo profesorTo) {
+        Profesor profesor = ProfesorMapper.toEntity(profesorTo);
         this.profesorService.guardar(profesor);
         return Response.status(Response.Status.CREATED).entity("Profesor guardado exitosamente").build();
     }
@@ -68,7 +87,8 @@ public class ProfesorController {
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response actualizar(@RequestBody Profesor profesor, @PathParam("id") Integer id) {
+    public Response actualizar(@RequestBody ProfesorTo profesorTo, @PathParam("id") Integer id) {
+        Profesor profesor = ProfesorMapper.toEntity(profesorTo);
         profesor.setId(id);
         this.profesorService.actualizarPorId(profesor);
         return Response.status(Response.Status.OK).entity("Profesor actualizado exitosamente").build();
@@ -110,16 +130,7 @@ public class ProfesorController {
     @GET
     @Path("/{id}/hijos")
     public List<Hijo> obtenerHijosPorId(@PathParam("id") Integer id) {
-        Hijo hijo = new Hijo();
-        hijo.setNombre("Luisanfer");
-
-        Hijo hijo2 = new Hijo();
-        hijo2.setNombre("Ameno");
-
-        List<Hijo> hijos = new ArrayList<>();
-        hijos.add(hijo);
-        hijos.add(hijo2);
-        return hijos;
+        return this.iHijoService.buscarPorProfesorId(id);
     }
 
 }
