@@ -61,16 +61,27 @@ public class EstudianteController {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Consultar Estudiantes", description = "Este endpoint obtiene una lista de todos los estudiantes")
     public Response consultarEstudiantes(@QueryParam("genero") String genero,
-            @QueryParam("provincia") String provincia) {
-        System.out.println(provincia);
-        return Response.status(Response.Status.OK).entity(this.estudianteService.buscarTodos(genero)).build();
+            @QueryParam("provincia") String provincia, @Context UriInfo uriInfo) {
+        System.out.println("Provincia query param:" + provincia);
+
+        List<Estudiante> estudiantes = this.estudianteService.buscarTodos(genero);
+        List<EstudianteTo> estudianteTos = new ArrayList<>();
+
+        for(Estudiante e : estudiantes) {
+            EstudianteTo estudianteTo = EstudianteMapper.toTo(e);
+            estudianteTo.buildURI(uriInfo);
+            estudianteTos.add(estudianteTo);
+        }
+
+        return Response.status(Response.Status.OK).entity(estudianteTos).build();
     }
 
     @POST
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Guardar Estudiante", description = "Guarda un nuevo estudiante en el sistema")
-    public Response guardar(@RequestBody Estudiante estudiante) {
+    public Response guardar(@RequestBody EstudianteTo estudianteTo) {
+        Estudiante estudiante = EstudianteMapper.toEntity(estudianteTo);
         this.estudianteService.guardar(estudiante);
         return Response.status(Response.Status.CREATED).entity("Estudiante guardado exitosamente").build();
     }
@@ -78,7 +89,8 @@ public class EstudianteController {
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response actualizar(@RequestBody Estudiante estudiante, @PathParam("id") Integer id) {
+    public Response actualizar(@RequestBody EstudianteTo estudianteTo, @PathParam("id") Integer id) {
+        Estudiante estudiante = EstudianteMapper.toEntity(estudianteTo);
         estudiante.setId(id);
         this.estudianteService.actualizarPorId(estudiante);
         return Response.status(Response.Status.NO_CONTENT).build();
@@ -109,6 +121,27 @@ public class EstudianteController {
      * build();
      * }
      */
+
+     @PATCH
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response actualizarParcialPorId(@RequestBody EstudianteTo estudianteTo, @PathParam("id") Integer id) {
+        Estudiante e = this.estudianteService.buscarPorId(id);
+        if (estudianteTo.getApellido() != null) {
+            e.setApellido(estudianteTo.getApellido());
+        }
+        if (estudianteTo.getNombre() != null) {
+            e.setNombre(estudianteTo.getNombre());
+        }
+        if (estudianteTo.getFechaNacimiento() != null) {
+            e.setFechaNacimiento(estudianteTo.getFechaNacimiento());
+        }
+        if (estudianteTo.getGenero() != null) {
+            e.setGenero(estudianteTo.getGenero());
+        }
+        this.estudianteService.actualizarParcialPorId(e);
+        return Response.status(Response.Status.OK).build();
+    }
 
     @DELETE
     @Path("/{id}")
