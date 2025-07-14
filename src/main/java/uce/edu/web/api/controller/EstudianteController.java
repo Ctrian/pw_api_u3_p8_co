@@ -67,7 +67,7 @@ public class EstudianteController {
         List<Estudiante> estudiantes = this.estudianteService.buscarTodos(genero);
         List<EstudianteTo> estudianteTos = new ArrayList<>();
 
-        for(Estudiante e : estudiantes) {
+        for (Estudiante e : estudiantes) {
             EstudianteTo estudianteTo = EstudianteMapper.toTo(e);
             estudianteTo.buildURI(uriInfo);
             estudianteTos.add(estudianteTo);
@@ -122,7 +122,7 @@ public class EstudianteController {
      * }
      */
 
-     @PATCH
+    @PATCH
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response actualizarParcialPorId(@RequestBody EstudianteTo estudianteTo, @PathParam("id") Integer id) {

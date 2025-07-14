@@ -24,4 +24,12 @@ public class HijoRepositoryImpl implements HijoRepo {
         return myQuery.getResultList();
     }
 
+    @Override
+    public List<Hijo> buscarPorProfesorId(Integer id) {
+        TypedQuery<Hijo> myQuery = this.entityManager.createQuery("SELECT h FROM Hijo h WHERE h.profesor.id =: id",
+                Hijo.class);
+        myQuery.setParameter("id", id);
+        return myQuery.getResultList();
+    }
+
 }

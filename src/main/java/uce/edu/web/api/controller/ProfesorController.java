@@ -66,7 +66,7 @@ public class ProfesorController {
         List<Profesor> profesors = this.profesorService.buscarTodos();
         List<ProfesorTo> profesorTos = new ArrayList<>();
 
-        for(Profesor p : profesors) {
+        for (Profesor p : profesors) {
             ProfesorTo profesorTo = ProfesorMapper.toTo(p);
             profesorTo.buildURI(uriInfo);
             profesorTos.add(profesorTo);
@@ -118,6 +118,27 @@ public class ProfesorController {
      * entity("Profesor actualizado parcialmente").build();
      * }
      */
+
+    @PATCH
+    @Path("/{id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response actualizarParcialPorId(@RequestBody ProfesorTo profesorTo, @PathParam("id") Integer id) {
+    Profesor p = this.profesorService.buscarPorId(id);
+        if (profesorTo.getApellido() != null) {
+            p.setApellido(profesorTo.getApellido());
+        }
+        if (profesorTo.getNombre() != null) {
+            p.setNombre(profesorTo.getNombre());
+        }
+        if (profesorTo.getMateria() != null) {
+            p.setEmail(profesorTo.getEmail());
+        }
+        if (profesorTo.getEmail() != null) {
+            p.setEmail(profesorTo.getEmail());
+        }
+        this.profesorService.actualizarParcialPorId(p);
+        return Response.status(Response.Status.OK).build();
+    }
 
     @DELETE
     @Path("/{id}")
