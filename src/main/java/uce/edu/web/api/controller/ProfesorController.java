@@ -1,13 +1,11 @@
 package uce.edu.web.api.controller;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -17,18 +15,16 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.PUT;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import uce.edu.web.api.repository.modelo.Estudiante;
 import uce.edu.web.api.repository.modelo.Hijo;
-import uce.edu.web.api.repository.modelo.Profesor;
 import uce.edu.web.api.service.IHijoService;
 import uce.edu.web.api.service.IProfesorService;
-import uce.edu.web.api.service.mapper.EstudianteMapper;
 import uce.edu.web.api.service.mapper.ProfesorMapper;
-import uce.edu.web.api.service.to.EstudianteTo;
 import uce.edu.web.api.service.to.ProfesorTo;
 
 @Path("/profesores")
@@ -63,14 +59,9 @@ public class ProfesorController {
             @QueryParam("provincia") String provincia, @Context UriInfo uriInfo) {
         System.out.println("Provincia query param:" + provincia);
 
-        List<Profesor> profesors = this.profesorService.buscarTodos();
-        List<ProfesorTo> profesorTos = new ArrayList<>();
+        List<ProfesorTo> profesorTos = this.profesorService.buscarTodos().stream().map(ProfesorMapper::toTo)
+                .collect(Collectors.toList());
 
-        for (Profesor p : profesors) {
-            ProfesorTo profesorTo = ProfesorMapper.toTo(p);
-            profesorTo.buildURI(uriInfo);
-            profesorTos.add(profesorTo);
-        }
         return Response.status(Response.Status.CREATED).entity(profesorTos).build();
     }
 
@@ -78,52 +69,25 @@ public class ProfesorController {
     @Path("")
     @Consumes(MediaType.APPLICATION_JSON)
     @Operation(summary = "Guardar Profesor", description = "Guarda un nuevo profesor en el sistema")
-    public Response guardar(@RequestBody ProfesorTo profesorTo) {
-        Profesor profesor = ProfesorMapper.toEntity(profesorTo);
-        this.profesorService.guardar(profesor);
-        return Response.status(Response.Status.CREATED).entity("Profesor guardado exitosamente").build();
+    public void guardar(@RequestBody ProfesorTo profesorTo) {
+        this.profesorService.guardar(ProfesorMapper.toEntity(profesorTo));
     }
 
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response actualizar(@RequestBody ProfesorTo profesorTo, @PathParam("id") Integer id) {
-        Profesor profesor = ProfesorMapper.toEntity(profesorTo);
-        profesor.setId(id);
-        this.profesorService.actualizarPorId(profesor);
-        return Response.status(Response.Status.OK).entity("Profesor actualizado exitosamente").build();
+    public void actualizar(@RequestBody ProfesorTo profesorTo, @PathParam("id") Integer id) {
+        profesorTo.setId(id);
+        this.profesorService.actualizarPorId(ProfesorMapper.toEntity(profesorTo));
     }
-
-    /*
-     * @PATCH
-     * 
-     * @Path("/{id}")
-     * 
-     * @Consumes(MediaType.APPLICATION_JSON)
-     * public Response actualizarParcial(@RequestBody Profesor
-     * profesor, @PathParam("id") Integer id) {
-     * profesor.setId(id);
-     * Profesor p = this.profesorService.buscarPorId(id);
-     * if (profesor.getNombre() != null) {
-     * p.setNombre(profesor.getNombre());
-     * }
-     * if (profesor.getApellido() != null) {
-     * p.setApellido(profesor.getApellido());
-     * }
-     * if (profesor.getEmail() != null) {
-     * p.setEmail(profesor.getEmail());
-     * }
-     * this.profesorService.actualizarPorId(p);
-     * return Response.status(Response.Status.OK).
-     * entity("Profesor actualizado parcialmente").build();
-     * }
-     */
 
     @PATCH
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response actualizarParcialPorId(@RequestBody ProfesorTo profesorTo, @PathParam("id") Integer id) {
-    Profesor p = this.profesorService.buscarPorId(id);
+    public void actualizarParcialPorId(@RequestBody ProfesorTo profesorTo, @PathParam("id") Integer id) {
+        profesorTo.setId(id);
+
+        ProfesorTo p = ProfesorMapper.toTo(this.profesorService.buscarPorId(id));
         if (profesorTo.getApellido() != null) {
             p.setApellido(profesorTo.getApellido());
         }
@@ -136,15 +100,13 @@ public class ProfesorController {
         if (profesorTo.getEmail() != null) {
             p.setEmail(profesorTo.getEmail());
         }
-        this.profesorService.actualizarParcialPorId(p);
-        return Response.status(Response.Status.OK).build();
+        this.profesorService.actualizarParcialPorId(ProfesorMapper.toEntity(profesorTo));
     }
 
     @DELETE
     @Path("/{id}")
-    public Response eliminar(@PathParam("id") Integer id) {
+    public void eliminar(@PathParam("id") Integer id) {
         this.profesorService.eliminarPorId(id);
-        return Response.status(Response.Status.NO_CONTENT).entity("Profesor eliminado exitosamente").build();
     }
 
     // http://.../profesores/1/hijos GET
