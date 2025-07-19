@@ -3,9 +3,13 @@ package uce.edu.web.api.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.microprofile.jwt.Claim;
+import org.eclipse.microprofile.jwt.ClaimValue;
+import org.eclipse.microprofile.jwt.JsonWebToken;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.RequestBody;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -33,6 +37,13 @@ import uce.edu.web.api.service.to.EstudianteTo;
 public class EstudianteController {
 
     @Inject
+    JsonWebToken jwt;
+
+    @Inject
+    @Claim("sub")
+    ClaimValue<String> subject;
+
+    @Inject
     private IEstudianteService estudianteService;
 
     @Inject
@@ -42,6 +53,7 @@ public class EstudianteController {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @RolesAllowed("admin")
     public Response consultarEstudiantePorId(@PathParam("id") Integer id, @Context UriInfo uriInfo) {
 
         EstudianteTo estudianteTo = EstudianteMapper.toTo(this.estudianteService.buscarPorId(id));
@@ -100,7 +112,7 @@ public class EstudianteController {
         if (estudianteTo.getGenero() != null) {
             e.setGenero(estudianteTo.getGenero());
         }
-        this.estudianteService.actualizarParcialPorId(EstudianteMapper.toEntity(estudianteTo));
+        this.estudianteService.actualizarParcialPorId(EstudianteMapper.toEntity(e));
     }
 
     @DELETE

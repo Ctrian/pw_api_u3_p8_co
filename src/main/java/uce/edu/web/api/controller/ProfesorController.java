@@ -62,7 +62,7 @@ public class ProfesorController {
         List<ProfesorTo> profesorTos = this.profesorService.buscarTodos().stream().map(ProfesorMapper::toTo)
                 .collect(Collectors.toList());
 
-        return Response.status(Response.Status.CREATED).entity(profesorTos).build();
+        return Response.status(Response.Status.OK).entity(profesorTos).build();
     }
 
     @POST
